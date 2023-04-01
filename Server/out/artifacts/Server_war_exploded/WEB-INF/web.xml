@@ -12,4 +12,22 @@
     <servlet-name>SwipeServlet</servlet-name>
     <url-pattern>/swipe/*</url-pattern>
   </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MatchServlet</servlet-name>
+    <servlet-class>MatchServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MatchServlet</servlet-name>
+    <url-pattern>/matches/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>StatsServlet</servlet-name>
+    <servlet-class>StatsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>StatsServlet</servlet-name>
+    <url-pattern>/stats/*</url-pattern>
+  </servlet-mapping>
 </web-app>

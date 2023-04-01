@@ -15,10 +15,10 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 @WebServlet(name = "SwipeServlet", value = "/SwipeServlet")
 public class SwipeServlet extends HttpServlet {
-
   private static final String LEFT = "/left/";
   private static final String RIGHT = "/right/";
   private static final String MISSING_PARA = "Missing parameters!";
@@ -34,8 +34,7 @@ public class SwipeServlet extends HttpServlet {
   public void init() throws ServletException {
     super.init();
     ConnectionFactory connectionFactory = new ConnectionFactory();
-//    connectionFactory.setHost("52.40.75.107");
-    connectionFactory.setHost("35.91.118.2");
+    connectionFactory.setHost("35.90.1.27");
 //    connectionFactory.setUsername("newadmin");
 //    connectionFactory.setPassword("s0m3p4ssw0rd");
     connectionFactory.setUsername("yiming");
@@ -47,6 +46,12 @@ public class SwipeServlet extends HttpServlet {
     } catch (TimeoutException | IOException e) {
       System.out.println(e.getMessage());
     }
+//    // Initialize DynamoDB client
+//    AwsSessionCredentials awsCreds = AwsSessionCredentials.create(AWS_ACCESS_KEY, AWS_SECRET_KEY, AWS_SESSION_TOKEN);
+//    dynamoDbClient = DynamoDbClient.builder()
+//        .region(Region.of(AWS_REGION))
+//        .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
+//        .build();
   }
   private boolean isValidLeftOrRight(String leftOrRight) {
     return leftOrRight.equals(LEFT) || leftOrRight.equals(RIGHT);
@@ -140,4 +145,6 @@ public class SwipeServlet extends HttpServlet {
       res.getWriter().write(gson.toJson(new ResponseMessage(MISSING_PARA)));
     }
   }
+
+
 }

@@ -14,41 +14,42 @@ public class Threads {
   private static final int SWIPER_MAX_ID = 5000;
   private static final int SWIPEE_MAX_ID = 1000000;
   private static final int STATUS_CREATED = 201;
-//  private static String BASE_PATH = "http://localhost:8080/Server_war_exploded";
+//  private static String BASE_PATH = "http://localhost:8080/Server_war/";
 //  private static String BASE_PATH = "http://34.219.21.135:8080/Server_war/";
   private static String BASE_PATH = "http://a2loadbalancer-637467734.us-west-2.elb.amazonaws.com/Server_war/";
   private static final int RETRYTIMES = 5;
-  public static void threadsWithEqualAmountRequest(Integer numThreads, Integer numRequests, Counter counter, CountDownLatch completed)
+  public static void threadsWithEqualAmountRequest(Integer numThreads, Integer numRequests, Counter counter, CountDownLatch completed, CountDownLatch postThreadsStarted)
       throws InterruptedException {
     int avgRequest = numRequests / numThreads;
     for (int i = 0; i < numThreads ; i++) {
-      singleThread(counter, avgRequest, completed);
+      singleThread(counter, avgRequest, completed, postThreadsStarted);
     }
     completed.await();
   }
-  public static void threadsWithDifferentAmountRequest(Integer numThreads, Integer numRequests, Counter counter, CountDownLatch completed)
+  public static void threadsWithDifferentAmountRequest(Integer numThreads, Integer numRequests, Counter counter, CountDownLatch completed, CountDownLatch postThreadsStarted)
       throws InterruptedException {
     int avgRequest = numRequests / numThreads;
     int lastThreadRequest = numRequests - (avgRequest * (numThreads - 1));
     for (int i = 0; i < numThreads - 1 ; i++) {
-      singleThread(counter, avgRequest, completed);
+      singleThread(counter, avgRequest, completed, postThreadsStarted);
     }
-    singleThread(counter, lastThreadRequest, completed);
+    singleThread(counter, lastThreadRequest, completed, postThreadsStarted);
     completed.await();
   }
 
   private static void singleThread(Counter counter, int threadRequest,
-      CountDownLatch completed) {
+      CountDownLatch completed, CountDownLatch postThreadsStarted) {
     ApiClient client = new ApiClient();
     client.setBasePath(BASE_PATH);
-    Runnable thread = () -> { for(int j = 0; j < threadRequest; j++ ) {
-      try {
-        request(client, counter);
-      } catch (ApiException e) {
-        throw new RuntimeException(e);
-      }
-    }
-      counter.threadInc(); completed.countDown();};
+    Runnable thread = () -> {
+      postThreadsStarted.countDown();
+      for(int j = 0; j < threadRequest; j++ ) {
+        try {
+          request(client, counter);
+        } catch (ApiException e) {
+          throw new RuntimeException(e);
+        }
+      }counter.threadInc(); completed.countDown();};
     new Thread(thread).start();
   }
 
